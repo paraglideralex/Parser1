@@ -1,0 +1,9 @@
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\bin\Debug\Parse1.exe.config
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\bin\Debug\Parse1.exe
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\bin\Debug\Parse1.pdb
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\bin\Debug\WebDriver.dll
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.csproj.AssemblyReference.cache
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.csproj.CoreCompileInputs.cache
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.csproj.CopyComplete
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.exe
+C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.pdb
