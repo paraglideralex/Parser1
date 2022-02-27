@@ -55,13 +55,13 @@ namespace Parse1
             //Thread.Sleep(100);
 
             //Парсим параметры вовлечённости
-            IWebElement Rewiews = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' отзывов')])[1]"));
+            IWebElement Rewiews = driver.FindElement(By.XPath("(//div[@class='ui-a1'][contains(.,' отзыв')])[1]"));
             string RewiewsText = Rewiews.Text;
             //Thread.Sleep(100);
-            IWebElement Video = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' видео')])[1]"));
+            IWebElement Video = driver.FindElement(By.XPath("(//div[@class='ui-a1'][contains(.,' видео')])[1]"));
             string VideoText = Video.Text;
             //Thread.Sleep(100);
-            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' вопроса')])[1]"));
+            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-a1'][contains(.,' вопрос')])[1]"));
             string QuestionsText = Questions.Text;
           
             //Парсим цены

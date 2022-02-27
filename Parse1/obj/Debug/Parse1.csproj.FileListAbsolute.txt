@@ -7,3 +7,13 @@ C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.
 C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.csproj.CopyComplete
 C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.exe
 C:\Users\Marlo\Documents\Мари_\_Хозяин\Parse1\Parse1\obj\Debug\Parse1.pdb
+C:\Users\Александр\Desktop\Parser1\Parse1\bin\Debug\Parse1.exe.config
+C:\Users\Александр\Desktop\Parser1\Parse1\bin\Debug\Parse1.exe
+C:\Users\Александр\Desktop\Parser1\Parse1\bin\Debug\Parse1.pdb
+C:\Users\Александр\Desktop\Parser1\Parse1\bin\Debug\WebDriver.dll
+C:\Users\Александр\Desktop\Parser1\Parse1\obj\Debug\Parse1.csproj.AssemblyReference.cache
+C:\Users\Александр\Desktop\Parser1\Parse1\obj\Debug\Parse1.csproj.SuggestedBindingRedirects.cache
+C:\Users\Александр\Desktop\Parser1\Parse1\obj\Debug\Parse1.csproj.CoreCompileInputs.cache
+C:\Users\Александр\Desktop\Parser1\Parse1\obj\Debug\Parse1.csproj.CopyComplete
+C:\Users\Александр\Desktop\Parser1\Parse1\obj\Debug\Parse1.exe
+C:\Users\Александр\Desktop\Parser1\Parse1\obj\Debug\Parse1.pdb
