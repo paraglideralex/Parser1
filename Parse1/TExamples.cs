@@ -295,11 +295,15 @@ namespace Parse1
         public void FindElem3()
         {
             IWebDriver driver = new ChromeDriver();
+            //driver.Navigate().GoToUrl("https://www.ozon.ru/category/elektricheskie-teplye-poly-10217/?category_was_predicted=true&from_global=true&text=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9");
+            //Thread.Sleep(1000);
+
+
             driver.Navigate().GoToUrl("https://www.ozon.ru/category/elektricheskie-teplye-poly-10217/?category_was_predicted=true&from_global=true&text=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9");
             Thread.Sleep(1000);
 
             // нашли дивы с карточками
-            IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("hm3"));
+            IList <IWebElement> oCheckBox = driver.FindElements(By.ClassName("hm3"));
 
             //вычленяем из дивов дивы с ценами
             List<string> Prices = new List<string>();

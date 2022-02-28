@@ -41,9 +41,28 @@ namespace Parse1
         /// <returns></returns>
         public List<string> ClearPrices(string OldPrices)
         {
-            string OP = "1 795 ₽ 3 780 ₽";
-            //OP= OP.Replace(' ');
-            List<string> Prices = new List<string>();
+            //Начальный список из 2 цен, равных 0
+            string[] PricesString = new string[2];
+            PricesString[0] = "";
+            PricesString[1] = "";
+
+            int Rows = 0;
+            foreach (char Char1 in OldPrices)
+            {
+                if (Char1 == '₽')
+                {
+                    Rows++;//переносим на следующую строку
+                }
+                if (char.IsDigit(Char1) == true) //выводим только цифры
+                {
+                    PricesString[Rows] += Char1;
+                }
+
+            }
+            //Получаем стринговый список цен после и до скидки, либо 0 вместо "до"
+            List<string> Prices = PricesString.ToList<string>();
+
+            //List<string> Prices = new List<string>();
             return Prices;
         }
         /// <summary>
@@ -60,18 +79,39 @@ namespace Parse1
             int[] indexes = new int[SizeInput];
             List<string> FoundData = new List<string>();
 
-            for (int i=0;i< SizeInput-1;i++)
+            for (int i=0;i< SizeInput;i++)
             {
-                    indexes[i] = WhereToFind.IndexOf(InputParameters[i]);
-                if (indexes[i] == -1)
-                {
-                    indexes[i] = SizeInput - 1;
-                }
-                    FoundData.Add(WhatToFind[indexes[i]]);
+                indexes[i] = WhereToFind.IndexOf(InputParameters[i]);
+                    if (indexes[i] == -1)
+                    {
+                        FoundData.Add("!НЕТ ДАННЫХ!");
+                    }
+                    else
+                    {
+                        FoundData.Add(WhatToFind[indexes[i]]);
+                    }
+                    
             }
 
             //List<string> Prices = new List<string>();
             return FoundData;
+        }
+        /// <summary>
+        /// Выводим числовую часть из строки, находящуюся перед словесной по первой букве первого слова
+        /// </summary>
+        /// <param name="BasicString"></param>
+        /// <param name="Letter"></param>
+        /// <returns></returns>
+        public string GetStringBeforeLetters (string BasicString, string Letter)
+        {
+            //Отсекаем числовую часть по первому вхождению буквы "Letter" в первом слове
+            int IndexOff = BasicString.IndexOf(Letter);
+            String NewString = "";
+            for (int i = 0; i < IndexOff - 1; i++)
+            {
+                NewString += BasicString[i]; // записываем всё, что левее слова отзыв
+            }
+            return NewString;
         }
 
 
