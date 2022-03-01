@@ -59,8 +59,9 @@ namespace Parse1
             driver.Navigate().GoToUrl("https://www.ozon.ru/category/elektricheskie-teplye-poly-10217/?category_was_predicted=true&from_global=true&text=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9");
             Thread.Sleep(3000);
 
-            Pages.PageParser(driver, InputParameters);
+            //Pages.PageParser(driver, InputParameters);
 
+            Pages.ParseTotal(driver, InputParameters, 5);
             //парсим карточку
             //string H = Pages.CardParser(driver, InputParameters);
 

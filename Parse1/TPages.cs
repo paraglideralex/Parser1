@@ -49,7 +49,7 @@ namespace Parse1
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
-            IWebElement Code = driver.FindElement(By.XPath("//span[@class='rj7'][contains(.,'Код')]"));
+            IWebElement Code = driver.FindElement(By.XPath("//span[@class='r6j j7r'][contains(.,'Код')]"));
             string CodeTextPrev = Code.Text;
             string CodeText = "";
 
@@ -65,13 +65,39 @@ namespace Parse1
             //Thread.Sleep(100);
 
             //Парсим параметры вовлечённости
-            IWebElement Rewiews = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' отзы')])[1]"));
-            string RewiewsText = Rewiews.Text;
+            
+            
+
+            string RewiewsText = "0";
+            //Thread.Sleep(100);
+            try
+            {
+                RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' отзы')])[1]")).Text;
+            }
+            catch (OpenQA.Selenium.NoSuchElementException e)
+            {
+                //IWebElement Video = new IWebElement();
+                RewiewsText = "0";
+            }
+
             string RewiewsTextNum = StringUtilities.GetStringBeforeLetters(RewiewsText, "о");
 
+
+            string VideoText = "0";
             //Thread.Sleep(100);
-            IWebElement Video = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' виде')])[1]"));
-            string VideoText = Video.Text;
+            try
+            {
+                //IWebElement Video = ;
+                 VideoText = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' виде')])[1]")).Text;
+            }
+            catch (OpenQA.Selenium.NoSuchElementException e)
+            {
+                //IWebElement Video = new IWebElement();
+                 VideoText = "0";
+            }
+            
+            //OpenQA.Selenium.NoSuchElementException
+            
             string VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
             //Thread.Sleep(100);
             IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' вопро')])[1]"));
@@ -79,7 +105,7 @@ namespace Parse1
             string QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
             //Парсим цены
             //для этого читаем весь див с ценами и ценой в кредит
-            IWebElement Prices = driver.FindElement(By.ClassName("j6u"));
+            IWebElement Prices = driver.FindElement(By.ClassName("k4k"));
             string PricesText = Prices.Text;
 
             //Из него выводим только последнюю строку
@@ -102,7 +128,7 @@ namespace Parse1
             //IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("x7j"));
 
             //вычленяем названия параметров товара
-            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("t1i"));
+            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("yi8"));
             //string t = oCheckBox.Text;
             List<string> ParameterNames = new List<string>();
             foreach (IWebElement s in ParameterNamesCol)
@@ -120,7 +146,7 @@ namespace Parse1
             }
 
             ////вычленяем параметры товара
-            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("it2"));
+            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("i8y"));
             //string t = oCheckBox.Text;
             List<string> Parameters = new List<string>();
             foreach (IWebElement s in ParameterCol)
@@ -170,13 +196,8 @@ namespace Parse1
         {
             TPages Pages = new TPages();
             string PageString = "";
-
-            ///https://automated-testing.info/t/obshhij-algoritm-resheniya-element-is-not-attached-to-page-document/13003/5
-
+          
             //Находим координаты всех карточек на странице
-            // IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("h3p"));
-            //IList<IWebElement> oCheckBox = driver.FindElements(By.XPath("(//div[contains(@class,'h3p')])[117]")); 
-            // IList<IWebElement> oCheckBox = driver.FindElements(By.TagName("a"));
             //Сначала находим див со ссылкой на страницу
             IList<IWebElement> ClickList = driver.FindElements(By.ClassName("hw"));
             int i = 0;
@@ -195,9 +216,10 @@ namespace Parse1
 
             for (int j=0;j<NumberOfCards; j++)
             {
+                Console.WriteLine("Парсим карточку # " + j);
                 // используя сохранённые ссылки, можно гулять по всей странице, ниже это сделано вручную
                 driver.Navigate().GoToUrl(ListOfReferences2Cards[j]);
-                Thread.Sleep(2000);
+                Thread.Sleep(1000);
                 string CardParserString = Pages.CardParser(driver, InputParameters);
                 PageString += CardParserString + "\r\n";
 
@@ -208,67 +230,14 @@ namespace Parse1
                 read.Write("\r\n");
 
                 driver.Navigate().Back();
-                Thread.Sleep(200);
+                Thread.Sleep(100);
                 driver.Navigate().Refresh();
-                Thread.Sleep(500);
+                Thread.Sleep(100);
             }
 
             File.WriteAllText("WriteText333.txt", PageString);
 
-
-            // используя сохранённые ссылки, можно гулять по всей странице, ниже это сделано вручную
-            driver.Navigate().GoToUrl(ListOfReferences2Cards[0]);
-            Thread.Sleep(5000);
-            string H = Pages.CardParser(driver, InputParameters);
-            PageString+=H+ "\r\n";
-            driver.Navigate().Back();
-            driver.Navigate().Refresh();
-
-            //try
-            //{
-
-            //}
-            //IWebElement ee1 = ClickList[1].FindElement(By.TagName("a"));
-            //string oo1 = ee1.GetAttribute("href");
-            driver.Navigate().GoToUrl(ListOfReferences2Cards[1]);
-            Thread.Sleep(3000);
-            string H1 = Pages.CardParser(driver, InputParameters);
-            PageString += H1 + "\r\n";
-            driver.Navigate().Back();
-            driver.Navigate().Refresh();
-
-            driver.Navigate().GoToUrl(ListOfReferences2Cards[2]);
-            Thread.Sleep(3000);
-            string H2 = Pages.CardParser(driver, InputParameters);
-            PageString += H2 + "\r\n";
-            driver.Navigate().Back();
-            driver.Navigate().Refresh();
-            File.WriteAllText("WriteText222.txt", PageString);
-
-
-
-
-            List<string> yy = new List<string>();
-            foreach (IWebElement click in ClickList)
-            {
-                string ByID = click.GetAttribute("href");
-                yy.Add(ByID);
-            }
-            ClickList[0].Click();
-            Thread.Sleep(3000);
-            driver.Navigate().Back();
-            driver.Navigate().Refresh();
-            driver.Close();
-
-            //IWebDriver driver = new ChromeDriver();
-            driver.Navigate().GoToUrl("https://www.ozon.ru/category/elektricheskie-teplye-poly-10217/?category_was_predicted=true&from_global=true&text=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9");
-            Thread.Sleep(3000);
-            ClickList[0].Click();
-            Thread.Sleep(3000);
-            driver.Navigate().Back();
-            driver.Navigate().Refresh();
-            driver.Close();
-
+            ///https://automated-testing.info/t/obshhij-algoritm-resheniya-element-is-not-attached-to-page-document/13003/5
             //bool staleElement = true;
             //for (int i = 0; i < 4; i++)
             //{
@@ -287,30 +256,21 @@ namespace Parse1
             //            staleElement = true;//might be chance for infinity--coz (if the try-block keep on -failing.it won't resolve the issue,--> My Percepton in one case.)
             //        }
             //    }
-            //    Thread.Sleep(1000);
-            //    driver.Navigate().Back();
-            //    driver.Navigate().Refresh();
-            //    Thread.Sleep(1000);
 
-            //}
-            ////IList<IWebElement> ClickList = driver.FindElements(By.ClassName("q3h"));
-            ////IList<IWebElement> ClickList = new List<IWebElement>();
-            ////foreach (IWebElement s in oCheckBox)
-            ////{
-            ////    ClickList.Add(s.FindElement(By.TagName("span")));
-            ////}
 
-            ////ClickList[0].Click();
-            ////Thread.Sleep(3000);
-            ////driver.Navigate().Back();
-            ////driver.Navigate().Refresh();
-            ////ClickList = driver.FindElements(By.ClassName("q3h"));
-            ////Thread.Sleep(3000);
-            ////ClickList[1].Click();
-            ////Thread.Sleep(3000);
-            ////driver.Navigate().Back();
+            return PageString;
+        }
 
+        public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages)
+        {
+            //
+            IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-d7'][contains(.,'Дальше')]"));
+            NextPage.Click();
+            Thread.Sleep(1000);
+             NextPage = driver.FindElement(By.XPath("//div[@class='ui-d7'][contains(.,'Дальше')]"));
+            NextPage.Click();
             return "";
         }
+
     }
 }
