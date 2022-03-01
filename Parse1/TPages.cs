@@ -49,22 +49,32 @@ namespace Parse1
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
-            IWebElement Code = driver.FindElement(By.XPath("//span[@class='mj0 jm1'][contains(.,'Код товара: ')]"));
-            String CodeText = Code.Text;
-            CodeText = CodeText.Replace("Код: ", "");//оставили только цифры
+            IWebElement Code = driver.FindElement(By.XPath("//span[@class='rj7'][contains(.,'Код')]"));
+            string CodeTextPrev = Code.Text;
+            string CodeText = "";
+
+            foreach (char Char1 in CodeTextPrev)
+            {
+                if (char.IsDigit(Char1) == true) //выводим только цифры
+                {
+                    CodeText += Char1;
+                }
+
+            }
+            //CodeText = CodeText.Replace("Код товара: ", "");//оставили только цифры
             //Thread.Sleep(100);
 
             //Парсим параметры вовлечённости
-            IWebElement Rewiews = driver.FindElement(By.XPath("(//div[@class='ui-a1'][contains(.,' отзыв')])[1]"));
+            IWebElement Rewiews = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' отзы')])[1]"));
             string RewiewsText = Rewiews.Text;
             string RewiewsTextNum = StringUtilities.GetStringBeforeLetters(RewiewsText, "о");
 
             //Thread.Sleep(100);
-            IWebElement Video = driver.FindElement(By.XPath("(//div[@class='ui-a1'][contains(.,' видео')])[1]"));
+            IWebElement Video = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' виде')])[1]"));
             string VideoText = Video.Text;
             string VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
             //Thread.Sleep(100);
-            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-a1'][contains(.,' вопрос')])[1]"));
+            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' вопро')])[1]"));
             string QuestionsText = Questions.Text;
             string QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
             //Парсим цены
@@ -158,6 +168,7 @@ namespace Parse1
 
         public string PageParser(IWebDriver driver, List<string> InputParameters)
         {
+            TPages Pages = new TPages();
             string PageString = "";
 
             ///https://automated-testing.info/t/obshhij-algoritm-resheniya-element-is-not-attached-to-page-document/13003/5
@@ -167,20 +178,49 @@ namespace Parse1
             //IList<IWebElement> oCheckBox = driver.FindElements(By.XPath("(//div[contains(@class,'h3p')])[117]")); 
             // IList<IWebElement> oCheckBox = driver.FindElements(By.TagName("a"));
             //Сначала находим див со ссылкой на страницу
-            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("q3h"));
+            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("hw"));
             int i = 0;
-            List<string>ddddd = new List<string>();
+            List<string> ListOfReferences2Cards = new List<string>();
             //Для каждого дива находим его заголовок "а" и принадлежащий ему аттрибут - ссылку href, сохраняем
             foreach (IWebElement click in ClickList)
             {
                 IWebElement ee = ClickList[i].FindElement(By.TagName("a"));
                 string oo = ee.GetAttribute("href");
-                ddddd.Add(oo);
+                ListOfReferences2Cards.Add(oo);
                 i++;
             }
+
+            int NumberOfCards = ClickList.Count;
+            StreamWriter read = new StreamWriter("RarePoints.txt");
+
+            for (int j=0;j<NumberOfCards; j++)
+            {
+                // используя сохранённые ссылки, можно гулять по всей странице, ниже это сделано вручную
+                driver.Navigate().GoToUrl(ListOfReferences2Cards[j]);
+                Thread.Sleep(2000);
+                string CardParserString = Pages.CardParser(driver, InputParameters);
+                PageString += CardParserString + "\r\n";
+
+                foreach (char Ch in CardParserString)
+                {
+                    read.Write(Ch);
+                }
+                read.Write("\r\n");
+
+                driver.Navigate().Back();
+                Thread.Sleep(200);
+                driver.Navigate().Refresh();
+                Thread.Sleep(500);
+            }
+
+            File.WriteAllText("WriteText333.txt", PageString);
+
+
             // используя сохранённые ссылки, можно гулять по всей странице, ниже это сделано вручную
-            driver.Navigate().GoToUrl(ddddd[0]);
-            Thread.Sleep(3000);
+            driver.Navigate().GoToUrl(ListOfReferences2Cards[0]);
+            Thread.Sleep(5000);
+            string H = Pages.CardParser(driver, InputParameters);
+            PageString+=H+ "\r\n";
             driver.Navigate().Back();
             driver.Navigate().Refresh();
 
@@ -190,15 +230,21 @@ namespace Parse1
             //}
             //IWebElement ee1 = ClickList[1].FindElement(By.TagName("a"));
             //string oo1 = ee1.GetAttribute("href");
-            driver.Navigate().GoToUrl(ddddd[1]);
+            driver.Navigate().GoToUrl(ListOfReferences2Cards[1]);
             Thread.Sleep(3000);
+            string H1 = Pages.CardParser(driver, InputParameters);
+            PageString += H1 + "\r\n";
             driver.Navigate().Back();
             driver.Navigate().Refresh();
 
-            driver.Navigate().GoToUrl(ddddd[2]);
+            driver.Navigate().GoToUrl(ListOfReferences2Cards[2]);
             Thread.Sleep(3000);
+            string H2 = Pages.CardParser(driver, InputParameters);
+            PageString += H2 + "\r\n";
             driver.Navigate().Back();
             driver.Navigate().Refresh();
+            File.WriteAllText("WriteText222.txt", PageString);
+
 
 
 
