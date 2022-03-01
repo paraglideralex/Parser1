@@ -49,7 +49,7 @@ namespace Parse1
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
-            IWebElement Code = driver.FindElement(By.XPath("//span[@class='r6j j7r'][contains(.,'Код')]"));
+            IWebElement Code = driver.FindElement(By.XPath("//span[@class='js3 sj3'][contains(.,'Код')]"));
             string CodeTextPrev = Code.Text;
             string CodeText = "";
 
@@ -72,7 +72,7 @@ namespace Parse1
             //Thread.Sleep(100);
             try
             {
-                RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' отзы')])[1]")).Text;
+                RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-e8'][contains(.,' отзы')])[1]")).Text;//ui-d7
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -88,7 +88,7 @@ namespace Parse1
             try
             {
                 //IWebElement Video = ;
-                 VideoText = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' виде')])[1]")).Text;
+                 VideoText = driver.FindElement(By.XPath("(//div[@class=ui-e8'][contains(.,' виде')])[1]")).Text;//
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -100,12 +100,12 @@ namespace Parse1
             
             string VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
             //Thread.Sleep(100);
-            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-d7'][contains(.,' вопро')])[1]"));
+            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-e8'][contains(.,' вопро')])[1]"));
             string QuestionsText = Questions.Text;
             string QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
             //Парсим цены
             //для этого читаем весь див с ценами и ценой в кредит
-            IWebElement Prices = driver.FindElement(By.ClassName("k4k"));
+            IWebElement Prices = driver.FindElement(By.ClassName("lk3"));
             string PricesText = Prices.Text;
 
             //Из него выводим только последнюю строку
@@ -128,7 +128,7 @@ namespace Parse1
             //IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("x7j"));
 
             //вычленяем названия параметров товара
-            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("yi8"));
+            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("z4i"));
             //string t = oCheckBox.Text;
             List<string> ParameterNames = new List<string>();
             foreach (IWebElement s in ParameterNamesCol)
@@ -146,7 +146,7 @@ namespace Parse1
             }
 
             ////вычленяем параметры товара
-            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("i8y"));
+            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("zi4"));
             //string t = oCheckBox.Text;
             List<string> Parameters = new List<string>();
             foreach (IWebElement s in ParameterCol)
@@ -162,9 +162,6 @@ namespace Parse1
             {
                 ParameterStr += s + "\t";
             }
-
-            string CardCollection = Head1Text + "\t" + CodeText + "\t" + RewiewsText + "\t" + VideoText + "\t" + QuestionsText + "\t" + PricesText + "\t" + ParameterStr + "\t" + ParameterNamesStr;
-
 
             //Выделяем нужные атрибуты для внесения
             List<string> Attributes = new List<string>();
@@ -199,7 +196,7 @@ namespace Parse1
           
             //Находим координаты всех карточек на странице
             //Сначала находим див со ссылкой на страницу
-            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("hw"));
+            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("h6w"));
             int i = 0;
             List<string> ListOfReferences2Cards = new List<string>();
             //Для каждого дива находим его заголовок "а" и принадлежащий ему аттрибут - ссылку href, сохраняем
@@ -263,13 +260,22 @@ namespace Parse1
 
         public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages)
         {
-            //
-            IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-d7'][contains(.,'Дальше')]"));
-            NextPage.Click();
-            Thread.Sleep(1000);
-             NextPage = driver.FindElement(By.XPath("//div[@class='ui-d7'][contains(.,'Дальше')]"));
-            NextPage.Click();
-            return "";
+            TPages Pages = new TPages();
+            string TotalParceData = "";
+
+            for (int i = 0; i < NumberOfPages; i++)
+            {
+                string Card = Pages.PageParser(driver, InputParameters);
+                Card += "\r\n";
+                string.Concat(TotalParceData, Card);
+                IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-e8'][contains(.,'Дальше')]"));
+                NextPage.Click();
+                Thread.Sleep(1000);
+
+            }
+
+            File.WriteAllText("WriteText444.txt", TotalParceData);
+            return TotalParceData;
         }
 
     }
