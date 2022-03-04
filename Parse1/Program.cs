@@ -18,6 +18,8 @@ namespace Parse1
             TPages Pages = new TPages();
             TStringUtilities StringUtilities = new TStringUtilities();
 
+            //Examples.Tread1();
+
             //Examples.FirstTry();
             //Examples.Properties();
             //Examples.FindElem1();

@@ -13,7 +13,7 @@ namespace Parse1
 {
     class TExamples
     {
-        public void Navigation ()
+        public void Navigation()
         {
             //We have four Navigation commands
 
@@ -46,7 +46,7 @@ namespace Parse1
             Console.WriteLine(tagName);
             Console.WriteLine("Так выглядит работа " + "element1.GetAttribute(id)");
             Console.WriteLine(attValue);
-                        //driver.FindElement(By.Id("UserName")).Clear();
+            //driver.FindElement(By.Id("UserName")).Clear();
         }
 
         public void Attributes()
@@ -131,9 +131,9 @@ namespace Parse1
             //IWebElement parentElement2 = driver.FindElement(By.ClassName("ph8 h9p"));
             IWebElement parentElement = driver.FindElement(By.ClassName("hs3"));
             //затем можно обращаться к свойствам уже найденного элемента, ниже - код с инета
-                //IWebElement parentElement = driver.FindElement(By.ClassName("button"));
-                //IWebElement childElement = parentElement.FindElement(By.Id("submit"));
-                //childElement.Submit();
+            //IWebElement parentElement = driver.FindElement(By.ClassName("button"));
+            //IWebElement childElement = parentElement.FindElement(By.Id("submit"));
+            //childElement.Submit();
 
             //По имени тега, говорят, непопулярно
             //IWebElement TagElement = driver.FindElement(By.TagName("hs3"));
@@ -157,12 +157,12 @@ namespace Parse1
                 // String Value = oCheckBox.ElementAt(i).GetAttribute("value");
                 //IWebElement childElement1 = oCheckBox.ElementAt(i).FindElement(By.ClassName("tile-hover-target o2h"));
                 //IWebElement childElement3 = oCheckBox.ElementAt(i).FindElement(By.TagName("span"));
-                
+
                 //IWebElement childElement2 = oCheckBox.ElementAt(i).FindElement(By.XPath("(//span[contains(.,'пол')])[3]"));
                 //string y = childElement2.GetAttribute("id");
-                
+
                 //String Value = childElement2.Text;
-                 String Value = oCheckBox.ElementAt(i).Text;
+                String Value = oCheckBox.ElementAt(i).Text;
 
 
                 Cards.Add(Value);
@@ -303,11 +303,11 @@ namespace Parse1
             Thread.Sleep(1000);
 
             // нашли дивы с карточками
-            IList <IWebElement> oCheckBox = driver.FindElements(By.ClassName("hm3"));
+            IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("hm3"));
 
             //вычленяем из дивов дивы с ценами
             List<string> Prices = new List<string>();
-            foreach  (IWebElement s in oCheckBox)
+            foreach (IWebElement s in oCheckBox)
             {
                 var yy = s.FindElement(By.ClassName("ui-p8"));
                 //Console.WriteLine(yy.Text);
@@ -335,6 +335,17 @@ namespace Parse1
 
         }
 
+        public void Tread1()
+        {
+            for (int i=0;i<1000;i++)
+            {
+                Console.WriteLine(i);
+                if (i==200)
+                {
+                    return;
+                }
+            }
 
+        }
     }
 }

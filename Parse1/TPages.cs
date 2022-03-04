@@ -46,7 +46,21 @@ namespace Parse1
 
             //Начинаем работу
             //Парсим заголовок по тегу h1
-            IWebElement Head1 = driver.FindElement(By.TagName("h1"));
+            
+            Found1:
+            Console.WriteLine("");
+            Thread.Sleep(5000);
+            try
+            {
+                IWebElement Head1 = driver.FindElement(By.TagName("h1"));
+            }
+            catch (OpenQA.Selenium.NoSuchElementException e)
+            {
+                driver.Navigate().Refresh();
+                Console.WriteLine("Неполадки с поиском кнопки Далее, перезагружаюсь....");
+                goto Found1;
+            }
+            Thread.Sleep(1000);
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
@@ -288,12 +302,25 @@ namespace Parse1
 
             for (int i = 0; i < NumberOfPages; i++)
             {
+                //OpenQA.Selenium.NoSuchElementException
                 string Card = Pages.PageParser(driver, InputParameters);
                 Card += "\r\n";
                 TotalParceData = string.Concat(TotalParceData, Card);
                 // обновляем каждый виток, чтобы не выдавало ошибку
-                IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-f'][contains(.,'Дальше')]"));
-                NextPage.Click();
+                Found:
+                Console.WriteLine("");
+                Thread.Sleep(5000);
+                try
+                {
+                    IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-f'][contains(.,'Дальше')]"));
+                    NextPage.Click();
+                }
+                catch (OpenQA.Selenium.NoSuchElementException e)
+                {
+                    driver.Navigate().Refresh();
+                    Console.WriteLine("Неполадки с поиском кнопки Далее, перезагружаюсь....");
+                    goto Found;
+                }
                 Thread.Sleep(1000);
 
             }
