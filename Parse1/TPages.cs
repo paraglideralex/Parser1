@@ -37,8 +37,14 @@ namespace Parse1
         /// </summary>
         /// <param name="driver">созданный ранее гугл-драйвер</param>
         /// <param name="InputParameters">список переменных, которые хотим найти на карточке и вывести</param>
-        public string CardParser(IWebDriver driver, List<string> InputParameters)
+        public string CardParser(IWebDriver driver, List<string> InputParameters, ref int CardCounter, StreamWriter file)
         {
+            //
+            CardCounter++;
+            Console.WriteLine("********");
+            Console.WriteLine("Карточка ## " + CardCounter);
+            Console.WriteLine("********");
+            //
             //перед этим мы: загуглили запрос, перешли, прошли по первой карточке
             // Переходим по запросу
 
@@ -52,15 +58,15 @@ namespace Parse1
             Thread.Sleep(5000);
             try
             {
-                IWebElement Head1 = driver.FindElement(By.TagName("h1"));
+                IWebElement Head = driver.FindElement(By.TagName("h1"));
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
-                driver.Navigate().Refresh();
-                Console.WriteLine("Неполадки с поиском кнопки Далее, перезагружаюсь....");
+                //driver.Navigate().Refresh();
+                Console.WriteLine("Неполадки с поиском элементов на странице, скорее всего нужна КАПЧА, перезагружаюсь....");
                 goto Found1;
             }
-            Thread.Sleep(1000);
+            IWebElement Head1 = driver.FindElement(By.TagName("h1"));
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
@@ -103,7 +109,7 @@ namespace Parse1
             try
             {
                 //IWebElement Video = ;
-                 VideoText = driver.FindElement(By.XPath("(//div[@class=ui-f'][contains(.,' виде')])[1]")).Text;//
+                 VideoText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' виде')])[1]")).Text;//
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -212,6 +218,8 @@ namespace Parse1
             return OutputString;
 
             Console.WriteLine();
+            file.WriteLineAsync(OutputString+"\r\n");
+
 
         }
         /// <summary>
@@ -220,7 +228,7 @@ namespace Parse1
         /// <param name="driver">созданный драйвер</param>
         /// <param name="InputParameters">список параметров для CardParser</param>
         /// <returns></returns>
-        public string PageParser(IWebDriver driver, List<string> InputParameters)
+        public string PageParser(IWebDriver driver, List<string> InputParameters, StreamWriter file)
         {
             TPages Pages = new TPages();
             string PageString = "";
@@ -244,11 +252,11 @@ namespace Parse1
 
             for (int j=0;j<NumberOfCards; j++)
             {
-                Console.WriteLine("Парсим карточку # " + j);
+                //Console.WriteLine("Парсим карточку # " + j);
                 // используя сохранённые ссылки, можно гулять по всей странице, ниже это сделано вручную
                 driver.Navigate().GoToUrl(ListOfReferences2Cards[j]);
                 Thread.Sleep(1000);
-                string CardParserString = Pages.CardParser(driver, InputParameters);
+                string CardParserString = Pages.CardParser(driver, InputParameters, ref TStringUtilities.CardCounter, file);
                 PageString += CardParserString + "\r\n";
 
                 foreach (char Ch in CardParserString)
@@ -295,7 +303,7 @@ namespace Parse1
         /// <param name="InputParameters">Параметры с карточки на вывод и на вход субпрогам</param>
         /// <param name="NumberOfPages">Количество страниц для парсинга</param>
         /// <returns></returns>
-        public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages)
+        public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages, StreamWriter file)
         {
             TPages Pages = new TPages();
             string TotalParceData = "";
@@ -303,7 +311,7 @@ namespace Parse1
             for (int i = 0; i < NumberOfPages; i++)
             {
                 //OpenQA.Selenium.NoSuchElementException
-                string Card = Pages.PageParser(driver, InputParameters);
+                string Card = Pages.PageParser(driver, InputParameters, file);
                 Card += "\r\n";
                 TotalParceData = string.Concat(TotalParceData, Card);
                 // обновляем каждый виток, чтобы не выдавало ошибку
@@ -318,6 +326,7 @@ namespace Parse1
                 catch (OpenQA.Selenium.NoSuchElementException e)
                 {
                     driver.Navigate().Refresh();
+                    driver.Navigate().Back();
                     Console.WriteLine("Неполадки с поиском кнопки Далее, перезагружаюсь....");
                     goto Found;
                 }
