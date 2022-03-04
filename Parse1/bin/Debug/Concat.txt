@@ -1,0 +1,12 @@
+wordword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	afterword
+push	after

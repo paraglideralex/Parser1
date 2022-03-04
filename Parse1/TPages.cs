@@ -36,6 +36,7 @@ namespace Parse1
         /// Парсер отдельной карточки, субпрога
         /// </summary>
         /// <param name="driver">созданный ранее гугл-драйвер</param>
+        /// <param name="InputParameters">список переменных, которые хотим найти на карточке и вывести</param>
         public string CardParser(IWebDriver driver, List<string> InputParameters)
         {
             //перед этим мы: загуглили запрос, перешли, прошли по первой карточке
@@ -49,7 +50,7 @@ namespace Parse1
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
-            IWebElement Code = driver.FindElement(By.XPath("//span[@class='js3 sj3'][contains(.,'Код')]"));
+            IWebElement Code = driver.FindElement(By.XPath("//span[@class='jv3 vj3'][contains(.,'Код')]"));
             string CodeTextPrev = Code.Text;
             string CodeText = "";
 
@@ -72,7 +73,7 @@ namespace Parse1
             //Thread.Sleep(100);
             try
             {
-                RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-e8'][contains(.,' отзы')])[1]")).Text;//ui-d7
+                RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' отзы')])[1]")).Text;//ui-d7//ui-e8
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -88,7 +89,7 @@ namespace Parse1
             try
             {
                 //IWebElement Video = ;
-                 VideoText = driver.FindElement(By.XPath("(//div[@class=ui-e8'][contains(.,' виде')])[1]")).Text;//
+                 VideoText = driver.FindElement(By.XPath("(//div[@class=ui-f'][contains(.,' виде')])[1]")).Text;//
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -96,21 +97,32 @@ namespace Parse1
                  VideoText = "0";
             }
             
-            //OpenQA.Selenium.NoSuchElementException
-            
             string VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
             //Thread.Sleep(100);
-            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-e8'][contains(.,' вопро')])[1]"));
+
+            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' вопро')])[1]"));
             string QuestionsText = Questions.Text;
             string QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
+
             //Парсим цены
             //для этого читаем весь див с ценами и ценой в кредит
-            IWebElement Prices = driver.FindElement(By.ClassName("lk3"));
+            //IWebElement Prices = driver.FindElement(By.TagName("slot")).Text;//lk3//
+            //var Prices1 = driver.FindElement(By.TagName("/html/body/div[1]/div/div[1]/div[4]/div[3]/div[2]/div[2]/div/div/div/div[1]/div/div/div[2]")).Text;
+
+
+
+            IWebElement Prices = driver.FindElement(By.ClassName("k3o"));//lk3//
             string PricesText = Prices.Text;
 
-            //Из него выводим только последнюю строку
+            //Считаем количество элементов в диве
+            string[] separators = new string[] { "\t", "\r\n" };
+            string[] fil = PricesText.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            int Size = fil.GetLength(0);
 
-            int[] p = { 2 };
+
+            //Из него выводим только последнюю строку
+            //Если можно в кредит, то там 3 строки, если нельзя - одна
+            int[] p = { Size-1 };
             PricesText = StringUtilities.SelectedRows(PricesText, p);
 
             List<string> PricesNumbers = StringUtilities.ClearPrices(PricesText);
@@ -128,7 +140,7 @@ namespace Parse1
             //IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("x7j"));
 
             //вычленяем названия параметров товара
-            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("z4i"));
+            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("lj9"));
             //string t = oCheckBox.Text;
             List<string> ParameterNames = new List<string>();
             foreach (IWebElement s in ParameterNamesCol)
@@ -146,7 +158,7 @@ namespace Parse1
             }
 
             ////вычленяем параметры товара
-            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("zi4"));
+            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("l9j"));
             //string t = oCheckBox.Text;
             List<string> Parameters = new List<string>();
             foreach (IWebElement s in ParameterCol)
@@ -188,7 +200,12 @@ namespace Parse1
             Console.WriteLine();
 
         }
-
+        /// <summary>
+        /// Субпрога, парсит одну страницу с совокупностью карточек, на вывод - одна строка со всеми карточками, разбитыми построчно
+        /// </summary>
+        /// <param name="driver">созданный драйвер</param>
+        /// <param name="InputParameters">список параметров для CardParser</param>
+        /// <returns></returns>
         public string PageParser(IWebDriver driver, List<string> InputParameters)
         {
             TPages Pages = new TPages();
@@ -196,7 +213,7 @@ namespace Parse1
           
             //Находим координаты всех карточек на странице
             //Сначала находим див со ссылкой на страницу
-            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("h6w"));
+            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("yh5"));
             int i = 0;
             List<string> ListOfReferences2Cards = new List<string>();
             //Для каждого дива находим его заголовок "а" и принадлежащий ему аттрибут - ссылку href, сохраняем
@@ -257,7 +274,13 @@ namespace Parse1
 
             return PageString;
         }
-
+        /// <summary>
+        /// Главная функция парсинга выбранного количества страниц и вывода
+        /// </summary>
+        /// <param name="driver">созданный драйвер</param>
+        /// <param name="InputParameters">Параметры с карточки на вывод и на вход субпрогам</param>
+        /// <param name="NumberOfPages">Количество страниц для парсинга</param>
+        /// <returns></returns>
         public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages)
         {
             TPages Pages = new TPages();
@@ -267,14 +290,15 @@ namespace Parse1
             {
                 string Card = Pages.PageParser(driver, InputParameters);
                 Card += "\r\n";
-                string.Concat(TotalParceData, Card);
-                IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-e8'][contains(.,'Дальше')]"));
+                TotalParceData = string.Concat(TotalParceData, Card);
+                // обновляем каждый виток, чтобы не выдавало ошибку
+                IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-f'][contains(.,'Дальше')]"));
                 NextPage.Click();
                 Thread.Sleep(1000);
 
             }
 
-            File.WriteAllText("WriteText444.txt", TotalParceData);
+            File.WriteAllText("WriteTextTotal.txt", TotalParceData);
             return TotalParceData;
         }
 

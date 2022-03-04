@@ -14,6 +14,10 @@ namespace Parse1
     {
         static void Main(string[] args)
         {
+            TExamples Examples = new TExamples();
+            TPages Pages = new TPages();
+            TStringUtilities StringUtilities = new TStringUtilities();
+
             //Examples.FirstTry();
             //Examples.Properties();
             //Examples.FindElem1();
@@ -22,9 +26,8 @@ namespace Parse1
             //Здесь основная работа
             //Examples.FindElem3();
             //Pages.GoTo();
+            //StringUtilities.TesingConcat();
 
-            TExamples Examples = new TExamples();
-            TPages Pages = new TPages();
 
             int NumberOfPages2Look = 20;
 
@@ -52,28 +55,22 @@ namespace Parse1
 
 
             ////для работы CardParcer
-            //IWebDriver driver = new ChromeDriver();
-            //driver.Navigate().GoToUrl("https://www.ozon.ru/product/teplyy-pol-pod-plitku-1-m2-s-termoregulyatorom-264666355/?asb=fy22%252BhuKaCd%252BgpBkbeMgrjsI7pnlMmyhtorNfCReiaY%253D&asb2=DgEz4xCIieA5eulNlC8JEH7_jGEHaD9M0MuyOavi7koYjQts_XSKMtXBqnibNiPm&keywords=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9&sh=JSz-QQAAAA");
+            //driver.Navigate().GoToUrl("https://www.ozon.ru/product/teplyy-pol-pod-plitku-2-m2-s-termoregulyatorom-nagrevatelnyy-mat-2m-kv-264666953/?asb=XOKlGIya6fr6ea1xwwqeRo8Nr5oXzdfECCPhhipsvzk%253D&asb2=rHQ4Qjv_HZESKDDEEPXHEOTn9Wz5YuooDrX6mny_HIM1cn31RrGgEcz6LdRLaPOE&keywords=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9&sh=QX9lTgAAAA");
             //Thread.Sleep(1000);
+            ////парсим карточку
+            //string Page1 = Pages.CardParser(driver, InputParameters);
+
+
             //для работы PageParser
             driver.Navigate().GoToUrl("https://www.ozon.ru/category/elektricheskie-teplye-poly-10217/?category_was_predicted=true&from_global=true&text=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9");
             Thread.Sleep(3000);
 
-            //Pages.PageParser(driver, InputParameters);
+            string TotalParceData = Pages.ParseTotal(driver, InputParameters, 5);
 
-            Pages.ParseTotal(driver, InputParameters, 5);
-            //парсим карточку
-            //string H = Pages.CardParser(driver, InputParameters);
 
-            //foreach (char e in H)
-            //{
-            //    BasicRowStrng += e;
-            //}
-            //BasicRowStrng += "\r\n";
+            File.WriteAllText("WriteText11.txt", BasicRowStrng);
 
-            //File.WriteAllText("WriteText11.txt", BasicRowStrng);
-
-            //Начал выводить по каждой странице, проверить формирование драйвера
+            //Начал выводить по каждой странице, проверить формирование драйвераКласс
             Console.WriteLine();
 
 

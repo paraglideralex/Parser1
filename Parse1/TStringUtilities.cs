@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using System.IO;
+
 
 namespace Parse1
 {
@@ -109,9 +114,27 @@ namespace Parse1
             String NewString = "";
             for (int i = 0; i < IndexOff - 1; i++)
             {
-                NewString += BasicString[i]; // записываем всё, что левее слова отзыв
+                NewString += BasicString[i]; // записываем всё, что левее буквы
             }
             return NewString;
+        }
+
+        public void TesingConcat()
+        {
+            string a = "";
+            string b = "word";
+            string c = string.Concat(a, b);
+
+            string d = "word\r\npush\tafter";
+
+            string e = string.Concat(c, d);
+
+            for (int i=0;i<10;i++)
+            {
+                e = string.Concat(e, d);
+            }
+
+            File.WriteAllText("Concat.txt", e);
         }
 
 
