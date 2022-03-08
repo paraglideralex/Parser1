@@ -13,6 +13,7 @@ namespace Parse1
 {
     class TStringUtilities
     {
+        public static int CardCounter = 1;
         /// <summary>
         /// Находит из многих строк с разделителями нужные по номерам строк и выписывает их в строку с табуляционным разделителем
         /// </summary>
@@ -136,6 +137,21 @@ namespace Parse1
 
             File.WriteAllText("Concat.txt", e);
         }
+
+        public void ExportString (string Name)
+        {
+            StreamReader Reader = new StreamReader(Name);
+            string II = Reader.ReadToEnd();
+
+            string[] separators = new string[] { "\r\n" };
+//string[] separators = new string[] { "\t", "\r\n" };
+            string[] fil = II.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            File.WriteAllLines("WriteLines.txt", fil);
+
+
+        }
+
+        
 
 
 
