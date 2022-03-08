@@ -61,7 +61,7 @@ namespace Parse1
                 goto Found1;
             }
             Thread.Sleep(1000);
-            String Head1Text = Head1.Text;
+            //string Head1Text = Head1.Text;
 
             //Парсим код товара 
             IWebElement Code = driver.FindElement(By.XPath("//span[@class='jv3 vj3'][contains(.,'Код')]"));
@@ -191,7 +191,7 @@ namespace Parse1
 
             //Выделяем нужные атрибуты для внесения
             List<string> Attributes = new List<string>();
-            Attributes.Add(Head1Text);
+            //Attributes.Add(Head1Text);
             Attributes.Add(CodeText);
             Attributes.Add(RewiewsTextNum);
             Attributes.Add(VideoTextNum);

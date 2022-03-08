@@ -347,5 +347,76 @@ namespace Parse1
             }
 
         }
+        /// <summary>
+        /// Здесь я тренируюсь строить икс пассы по разным методикам на примере страницы с полом
+        /// </summary>
+        public void Tryin2Xpath ()
+        {
+            IWebDriver driver = new ChromeDriver();
+            driver.Navigate().GoToUrl("https://www.ozon.ru/product/teplyy-pol-pod-plitku-0-5-m2-s-termoregulyatorom-193001786/?sh=vlf6ogAAAA");
+
+            //1) Xpath Contains() function
+            //tag_name[contains(@attribute,'value_of_attribute')]
+            //IWebElement Contains1 = driver.FindElement(By.XPath("//div[contains(@class='ui-f', '76 вопросов')]"));
+            IWebElement Contains2 = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' вопро')])[1]"));
+            //input[contains(@id, "userN")]
+            //string Contains1Text = Contains1.Text;
+            string Contains2Text = Contains2.Text;
+
+            //2)XPath Starts-with() function
+            ////tag_name[starts-with(@attribute,'Part_of_Attribute_value')]
+            ///
+
+            //3)XPath Text() function
+            //This function uses the text of the web element for locating the element on the webpage. This function is quite useful if your element contains the text, for example, labels, which always contain a static text.
+            ////tag_name[text()='Text of the element']
+            //label[text()=”Email”]
+            //IWebElement Contains3 = driver.FindElement(By.XPath("//div[text()=' вопросов')]"));
+            //string Contains3Text = Contains3.Text;
+
+            // тут мы смогли найти элемент по абсолютному икс-пассу ("в хроме опция Copy full XPath") без имён классов, что очень и очень хорошо
+            IWebElement Contains3 = driver.FindElement(By.XPath("/ html / body / div[1] / div / div[1] / div[4] / div[2] / div / div / div[2] / div / div[1] / div[3] / div / a / div / div"));
+            string Contains3Text = Contains3.Text;
+
+            // цены
+            IWebElement Contains4 = driver.FindElement(By.XPath("/html/body/div[1]/div/div[1]/div[4]/div[3]/div[2]/div[2]/div/div/div/div[1]/div/div/div[2]"));
+            string Contains4Text = Contains4.Text;
+
+            // атрибуты
+            IWebElement Contains5 = driver.FindElement(By.TagName("dt"));
+            string Contains5Text = Contains5.Text;
+
+
+            IList<IWebElement> ParameterCol = driver.FindElements(By.TagName("dd"));
+            //string t = oCheckBox.Text;
+            List<string> Parameters = new List<string>();
+            for (int i=0;i<ParameterCol.Count;i++)
+            {
+                foreach (var s1 in Parameters)
+                {
+                    if (ParameterCol[i].Text == s1)
+                    {
+                        i++;
+                    }
+
+                }
+                    //var yy = s.FindElement(By.ClassName("ui-p8"));
+                    //Console.WriteLine(yy.Text);
+                    string Text = ParameterCol[i].Text;
+                Text = Text.Replace("\r\n", "\t");
+                Parameters.Add(Text);
+            }
+            string ParameterStr = "";
+            foreach (string s in Parameters)
+            {
+                ParameterStr += s + "\t";
+            }
+            //*[@id="section-characteristics"]/div[2]/div/div[1]/dl[2]
+
+            //string Price = Value2.Text;
+            string y = "";
+
+        }
+
     }
 }

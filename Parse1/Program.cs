@@ -30,6 +30,7 @@ namespace Parse1
             //Pages.GoTo();
             //StringUtilities.TesingConcat();
 
+            Examples.Tryin2Xpath();
 
             int NumberOfPages2Look = 20;
 
