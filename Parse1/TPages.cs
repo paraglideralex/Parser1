@@ -70,8 +70,27 @@ namespace Parse1
             String Head1Text = Head1.Text;
 
             //Парсим код товара 
-            IWebElement Code = driver.FindElement(By.XPath("//span[@class='jv3 vj3'][contains(.,'Код')]"));
-            string CodeTextPrev = Code.Text;
+            //IWebElement Code = driver.FindElement(By.XPath("//span[@class='jv3 vj3'][contains(.,'Код')]")); исходный
+
+            //IWebElement Code2 = driver.FindElement(By.XPath("//div[text() = 'Код ']"));// нет
+            //button
+            //IWebElement Code3 = driver.FindElement(By.XPath("//div[. = 'Код']"));//нет
+
+            // IWebElement Code4 = driver.FindElement(By.XPath("//*[contains(., 'Код')]"));
+            //string CodeTextPrev4 = Code4.Text;//вообще весь
+            //IWebElement Code5 =  driver.FindElement(By.XPath("//div[contains(text(),'Код')]"));//нет
+            //string CodeTextPrev5 = Code5.Text;
+            //IWebElement Code6 = driver.FindElement(By.XPath("//div[][. = 'Код']"));//неправильный икс пасс
+            //string CodeTextPrev5 = Code6.Text;
+            string CodeTextPrev = driver.FindElement(By.CssSelector("span[data-widget='webDetailSKU']")).Text;
+            // string CodeTextPrev2 = Code2.Text;
+            // string CodeTextPrev3 = Code3.Text;
+            ////вычленяем параметры товара
+            ///webVideosCount
+
+
+
+
             string CodeText = "";
 
             foreach (char Char1 in CodeTextPrev)
@@ -93,7 +112,8 @@ namespace Parse1
             //Thread.Sleep(100);
             try
             {
-                RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' отзы')])[1]")).Text;//ui-d7//ui-e8
+                //RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' отзы')])[1]")).Text;//ui-d7//ui-e8
+                RewiewsText = driver.FindElement(By.CssSelector("div[data-widget='webReviewProductScore']")).Text;
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -109,7 +129,8 @@ namespace Parse1
             try
             {
                 //IWebElement Video = ;
-                 VideoText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' виде')])[1]")).Text;//
+                // VideoText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' виде')])[1]")).Text;//
+                VideoText = driver.FindElement(By.CssSelector("div[data-widget='webVideosCount']")).Text; // 
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
@@ -120,80 +141,99 @@ namespace Parse1
             string VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
             //Thread.Sleep(100);
 
-            IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' вопро')])[1]"));
-            string QuestionsText = Questions.Text;
+            //IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' вопро')])[1]"));
+            string QuestionsText = driver.FindElement(By.CssSelector("div[data-widget='webQuestionCount']")).Text;
+            //string QuestionsText = Questions.Text;
             string QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
 
             //Парсим цены
             //для этого читаем весь див с ценами и ценой в кредит
-            //IWebElement Prices = driver.FindElement(By.TagName("slot")).Text;//lk3//
-            //var Prices1 = driver.FindElement(By.TagName("/html/body/div[1]/div/div[1]/div[4]/div[3]/div[2]/div[2]/div/div/div/div[1]/div/div/div[2]")).Text;
-
-
-
-            IWebElement Prices = driver.FindElement(By.ClassName("k3o"));//lk3//
+            //IWebElement Prices = driver.FindElement(By.ClassName("k3o"));//lk3//
+            IWebElement Prices = driver.FindElement(By.CssSelector("div[data-widget='webPrice']"));    
             string PricesText = Prices.Text;
-
             //Считаем количество элементов в диве
             string[] separators = new string[] { "\t", "\r\n" };
             string[] fil = PricesText.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             int Size = fil.GetLength(0);
-
-
             //Из него выводим только последнюю строку
             //Если можно в кредит, то там 3 строки, если нельзя - одна
             int[] p = { Size-1 };
             PricesText = StringUtilities.SelectedRows(PricesText, p);
-
             List<string> PricesNumbers = StringUtilities.ClearPrices(PricesText);
 
-            //ебёмся с рейтингом
-            // классы он упорно не видит
-            // пробовал парсить весь body, без результата, там нету текста с оценками
-            // пробовал парсить класс с пустым именем, оценок нет
-            //Thread.Sleep(100);
-            //IWebElement Rate = driver.FindElement(By.ClassName("x7j"));
-            // IWebElement Rate = driver.FindElement(By.XPath("//div[contains(@class, '')]"));
-            //string RateText = Rate.Text;
-            //IWebElement Rate1 = driver.FindElement(By.TagName("body"));
-            //string RateText1 = Rate1.Text;
-            //IList<IWebElement> oCheckBox = driver.FindElements(By.ClassName("x7j"));
+            //Выводим рейтинг
+            string Rate = driver.FindElement(By.CssSelector("div[data-widget='webCurrentSeller']")).Text;
 
+            //string Rate1 = driver.FindElement(By.TagName("span")).FindElement(By.TagName("strong")).Text;
+            string RateNew = StringUtilities.FindWhatUNeed(Rate);
+            RateNew.Replace(" ", "");
+            string RateText = StringUtilities.GetStringBeforeLetters(RateNew, "и");
             //вычленяем названия параметров товара
-            IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("lj9"));
-            //string t = oCheckBox.Text;
-            List<string> ParameterNames = new List<string>();
-            foreach (IWebElement s in ParameterNamesCol)
+
+            List<string> ParameterNames1 = new List<string>();
+            List<string> Parameters1 = new List<string>();
+            string Data = driver.FindElement(By.Id("section-characteristics")).Text;
+            string[] DataArr = StringUtilities.ToStringArray(Data);
+            int DataLength = DataArr.GetLength(0);
+            for (int i=1; i<DataLength-1; i++)
             {
-                //var yy = s.FindElement(By.ClassName("ui-p8"));
-                //Console.WriteLine(yy.Text);
-                string Text = s.Text;
-                Text = Text.Replace("\r\n", "\t");
-                ParameterNames.Add(Text);
-            }
-            string ParameterNamesStr = "";
-            foreach (string s in ParameterNames)
-            {
-                ParameterNamesStr += s + "\t";
+                if (i%2!=0)
+                {
+                    ParameterNames1.Add(DataArr[i]);
+                }
+                else
+                {
+                    Parameters1.Add(DataArr[i]);
+                }
             }
 
-            ////вычленяем параметры товара
-            IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("l9j"));
-            //string t = oCheckBox.Text;
-            List<string> Parameters = new List<string>();
-            foreach (IWebElement s in ParameterCol)
+            string ParameterNamesStr1 = "";
+            foreach (string s in ParameterNames1)
             {
-                //var yy = s.FindElement(By.ClassName("ui-p8"));
-                //Console.WriteLine(yy.Text);
-                string Text = s.Text;
-                Text = Text.Replace("\r\n", "\t");
-                Parameters.Add(Text);
+                ParameterNamesStr1 += s + "\t";
             }
-            string ParameterStr = "";
-            foreach (string s in Parameters)
+
+            string ParameterStr1 = "";
+            foreach (string s in Parameters1)
             {
-                ParameterStr += s + "\t";
+                ParameterStr1 += s + "\t";
             }
+
+            //IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("lj9"));
+            ////string t = oCheckBox.Text;
+            //List<string> ParameterNames = new List<string>();
+            
+            //foreach (IWebElement s in ParameterNamesCol)
+            //{
+            //    //var yy = s.FindElement(By.ClassName("ui-p8"));
+            //    //Console.WriteLine(yy.Text);
+            //    string Text = s.Text;
+            //    Text = Text.Replace("\r\n", "\t");
+            //    ParameterNames.Add(Text);
+            //}
+            //string ParameterNamesStr = "";
+            //foreach (string s in ParameterNames)
+            //{
+            //    ParameterNamesStr += s + "\t";
+            //}
+
+            //////вычленяем параметры товара
+            //IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("l9j"));
+            ////string t = oCheckBox.Text;
+            //List<string> Parameters = new List<string>();
+            //foreach (IWebElement s in ParameterCol)
+            //{
+            //    //var yy = s.FindElement(By.ClassName("ui-p8"));
+            //    //Console.WriteLine(yy.Text);
+            //    string Text = s.Text;
+            //    Text = Text.Replace("\r\n", "\t");
+            //    Parameters.Add(Text);
+            //}
+            //string ParameterStr = "";
+            //foreach (string s in Parameters)
+            //{
+            //    ParameterStr += s + "\t";
+            //}
 
             //Выделяем нужные атрибуты для внесения
             List<string> Attributes = new List<string>();
@@ -202,10 +242,11 @@ namespace Parse1
             Attributes.Add(RewiewsTextNum);
             Attributes.Add(VideoTextNum);
             Attributes.Add(QuestionsTextNum);
+            Attributes.Add(RateText);
             Attributes.AddRange(PricesNumbers);
 
             // Выделяем нужные параметры для внесения в таблицу
-            List<string> ParametersOut = StringUtilities.ChooseParameters(InputParameters, ParameterNames, Parameters);
+            List<string> ParametersOut = StringUtilities.ChooseParameters(InputParameters, ParameterNames1, Parameters1);
             //Делаем список всех параметров на вывод
             List<string> Output = Attributes;
             Output.AddRange(ParametersOut);
@@ -215,10 +256,11 @@ namespace Parse1
             {
                 OutputString += e + "\t";
             }
+            file.WriteLineAsync(OutputString+"\r\n");
             return OutputString;
 
             Console.WriteLine();
-            file.WriteLineAsync(OutputString+"\r\n");
+            
 
 
         }

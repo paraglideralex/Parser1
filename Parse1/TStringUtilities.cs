@@ -151,8 +151,30 @@ namespace Parse1
 
         }
 
-        
+        public string FindWhatUNeed(string Name)
+        {
+            string[] separators = new string[] { "\t", "\r\n" };
+            string[] fil = Name.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            string Ans = "0";
+            foreach (string s in fil)
+            {
+                if (s.Contains("из 5"))
+                {
+                    Ans = s;
+                }
 
+            }
+            //var T = Name.ToList();
+
+            return Ans;
+        }
+
+        public string[] ToStringArray(string Name)
+        {
+            string[] separators = new string[] { "\t", "\r\n" };
+            string[] fil = Name.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            return fil;
+        }
 
 
 

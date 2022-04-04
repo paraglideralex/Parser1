@@ -347,5 +347,15 @@ namespace Parse1
             }
 
         }
+
+        public void SellerSearch()
+        {
+            IWebDriver driver = new ChromeDriver();
+            driver.Navigate().GoToUrl("https://seller.ozon.ru/app/analytics/what-to-sell/ozon-bestsellers");
+        }
+
+
+
+
     }
 }
