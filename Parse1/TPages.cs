@@ -7,6 +7,9 @@ using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.IO;
+using OpenQA.Selenium.Support.UI;
+using System.Globalization;
+
 
 namespace Parse1
 {
@@ -37,25 +40,49 @@ namespace Parse1
         /// </summary>
         /// <param name="driver">созданный ранее гугл-драйвер</param>
         /// <param name="InputParameters">список переменных, которые хотим найти на карточке и вывести</param>
+        /// <param name="CardCounter">абсолютный счётчик спарсенного числа карточек</param>
+        /// <param name="file">текстовый поток для вывода в файл</param>
+        /// <returns>строка с параметрами одной карточки</returns>
         public string CardParser(IWebDriver driver, List<string> InputParameters, ref int CardCounter, StreamWriter file)
         {
+            //делаем автоматическое ожидание появления элементов
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            TFunctions Functions = new TFunctions();
+            TStringUtilities StringUtilities = new TStringUtilities();
             //
             CardCounter++;
-            Console.WriteLine("********");
-            Console.WriteLine("Карточка ## " + CardCounter);
-            Console.WriteLine("********");
-            //
+            Console.WriteLine("---Карточка #" + CardCounter+"---");
+            Console.Write("Прогресс: ");
+
             //перед этим мы: загуглили запрос, перешли, прошли по первой карточке
-            // Переходим по запросу
-
-            TStringUtilities StringUtilities = new TStringUtilities();
-
             //Начинаем работу
-            //Парсим заголовок по тегу h1
+            string URL = driver.Url;
+            //Проверяем наличие и статус атрибутов товара, есть ли отзывы, видео итд
+            List<string> BasicList = new List<string>();
+            IList<IWebElement> Basic = driver.FindElements(By.CssSelector("div[data-widget='column']"));
+            var BasicData = driver.FindElement(By.CssSelector("div[data-widget='column']")).Text;
+
+            for (int i=0; i<2; i++)
+            {
+                BasicList.Add(Basic[i].Text);
+            }
+            string BasicString = "";
+            foreach (string s in BasicList)
+            {
+                foreach (char c in s)
+                {
+                    BasicString += c;
+                }
+
+            }
+            bool VideoIsOrNot = StringUtilities.FindInList(BasicString, "видео");
+            bool QuestionIsOrNot = StringUtilities.FindInList(BasicString, "Задать");
+            bool ReviewIsOrNot = StringUtilities.FindInList(BasicString, "Оставить");
+
+
+        //Парсим заголовок по тегу h1
+        Found1:
             
-            Found1:
-            Console.WriteLine("");
-            Thread.Sleep(5000);
             try
             {
                 IWebElement Head = driver.FindElement(By.TagName("h1"));
@@ -64,126 +91,220 @@ namespace Parse1
             {
                 //driver.Navigate().Refresh();
                 Console.WriteLine("Неполадки с поиском элементов на странице, скорее всего нужна КАПЧА, перезагружаюсь....");
+                Console.WriteLine("");            
+                driver.Navigate().Refresh();
+                Thread.Sleep(10000);
                 goto Found1;
+                
             }
             IWebElement Head1 = driver.FindElement(By.TagName("h1"));
-            String Head1Text = Head1.Text;
+            string Head1Text = Head1.Text;
+            Console.Write(TStringUtilities.OutputSeparator+"Название"+ TStringUtilities.OutputSeparator);
 
-            //Парсим код товара 
-            //IWebElement Code = driver.FindElement(By.XPath("//span[@class='jv3 vj3'][contains(.,'Код')]")); исходный
-
-            //IWebElement Code2 = driver.FindElement(By.XPath("//div[text() = 'Код ']"));// нет
-            //button
-            //IWebElement Code3 = driver.FindElement(By.XPath("//div[. = 'Код']"));//нет
-
-            // IWebElement Code4 = driver.FindElement(By.XPath("//*[contains(., 'Код')]"));
-            //string CodeTextPrev4 = Code4.Text;//вообще весь
-            //IWebElement Code5 =  driver.FindElement(By.XPath("//div[contains(text(),'Код')]"));//нет
-            //string CodeTextPrev5 = Code5.Text;
-            //IWebElement Code6 = driver.FindElement(By.XPath("//div[][. = 'Код']"));//неправильный икс пасс
-            //string CodeTextPrev5 = Code6.Text;
-            string CodeTextPrev = driver.FindElement(By.CssSelector("span[data-widget='webDetailSKU']")).Text;
-            // string CodeTextPrev2 = Code2.Text;
-            // string CodeTextPrev3 = Code3.Text;
-            ////вычленяем параметры товара
-            ///webVideosCount
-
-
-
-
-            string CodeText = "";
-
-            foreach (char Char1 in CodeTextPrev)
-            {
-                if (char.IsDigit(Char1) == true) //выводим только цифры
-                {
-                    CodeText += Char1;
-                }
-
-            }
-            //CodeText = CodeText.Replace("Код товара: ", "");//оставили только цифры
-            //Thread.Sleep(100);
-
-            //Парсим параметры вовлечённости
-            
-            
-
-            string RewiewsText = "0";
-            //Thread.Sleep(100);
+        //Парсим код товара 
+        Found3:
+            string CodeTextPrev = "";
             try
             {
-                //RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' отзы')])[1]")).Text;//ui-d7//ui-e8
-                RewiewsText = driver.FindElement(By.CssSelector("div[data-widget='webReviewProductScore']")).Text;
+                CodeTextPrev = driver.FindElement(By.CssSelector("span[data-widget='webDetailSKU']")).Text;
             }
             catch (OpenQA.Selenium.NoSuchElementException e)
             {
-                //IWebElement Video = new IWebElement();
+                Console.WriteLine("Неполадки с поиском АРТИКУЛА, перезагружаюсь....");
+                Console.WriteLine("");
+                //driver.Navigate().Refresh();
+                Thread.Sleep(10000);
+                goto Found3;
+            }
+            
+            string CodeText = StringUtilities.OnlyDigits(CodeTextPrev);
+
+            Console.Write("Артикул"+ TStringUtilities.OutputSeparator);
+            //Парсим параметры вовлечённости     
+            string RewiewsText = "0";
+            string RewiewsTextNum = "";
+            //Thread.Sleep(100);
+
+            if (ReviewIsOrNot == false)//если есть отзывы - парсим
+            {
+                try
+                {
+                    //RewiewsText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' отзы')])[1]")).Text;//ui-d7//ui-e8
+                    RewiewsText = driver.FindElement(By.CssSelector("div[data-widget='webReviewProductScore']")).Text;
+                    RewiewsTextNum = StringUtilities.GetStringBeforeLetters(RewiewsText, "о");
+                }
+                catch (OpenQA.Selenium.NoSuchElementException e)
+                {
+                    //IWebElement Video = new IWebElement();
+                    RewiewsText = "0";
+                }
+            }
+            else // если нет - приравниваем к нулю
+            {
                 RewiewsText = "0";
+                RewiewsTextNum = "0";
             }
 
-            string RewiewsTextNum = StringUtilities.GetStringBeforeLetters(RewiewsText, "о");
-
+            //string RewiewsTextNum = StringUtilities.GetStringBeforeLetters(RewiewsText, "о");
+            Console.Write("Отзывы"+ TStringUtilities.OutputSeparator);
 
             string VideoText = "0";
-            //Thread.Sleep(100);
-            try
+            string VideoTextNum = "";
+            if (VideoIsOrNot == true)
             {
-                //IWebElement Video = ;
-                // VideoText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' виде')])[1]")).Text;//
-                VideoText = driver.FindElement(By.CssSelector("div[data-widget='webVideosCount']")).Text; // 
+                try
+                {
+                    // VideoText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' виде')])[1]")).Text;//
+                    VideoText = driver.FindElement(By.CssSelector("div[data-widget='webVideosCount']")).Text; // 
+                    VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
+                }
+                catch (OpenQA.Selenium.NoSuchElementException e)
+                {
+                    //IWebElement Video = new IWebElement();
+                    VideoText = "0";
+                }             
             }
-            catch (OpenQA.Selenium.NoSuchElementException e)
+            else
             {
-                //IWebElement Video = new IWebElement();
-                 VideoText = "0";
+                VideoText = "0";
+                VideoTextNum = "0";
             }
-            
-            string VideoTextNum = StringUtilities.GetStringBeforeLetters(VideoText, "в");
-            //Thread.Sleep(100);
+            Console.Write("Видео"+ TStringUtilities.OutputSeparator);
 
-            //IWebElement Questions = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' вопро')])[1]"));
-            string QuestionsText = driver.FindElement(By.CssSelector("div[data-widget='webQuestionCount']")).Text;
-            //string QuestionsText = Questions.Text;
-            string QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
+            string QuestionsText = "0";
+            string QuestionsTextNum = "";
+            //Thread.Sleep(100);
+            if (QuestionIsOrNot == false)
+            {
+                try
+                {
+                    // VideoText = driver.FindElement(By.XPath("(//div[@class='ui-f'][contains(.,' виде')])[1]")).Text;//
+                    QuestionsText = driver.FindElement(By.CssSelector("div[data-widget='webQuestionCount']")).Text;
+                    QuestionsTextNum = StringUtilities.GetStringBeforeLetters(QuestionsText, "в");
+                }
+                catch (OpenQA.Selenium.NoSuchElementException e)
+                {
+                    //IWebElement Video = new IWebElement();
+                    QuestionsText = "0";
+                }
+            }
+            else
+            {
+                QuestionsText = "0";
+                QuestionsTextNum = "0";
+            }
+
+            Console.Write("Вопросы"+ TStringUtilities.OutputSeparator);
 
             //Парсим цены
             //для этого читаем весь див с ценами и ценой в кредит
-            //IWebElement Prices = driver.FindElement(By.ClassName("k3o"));//lk3//
-            IWebElement Prices = driver.FindElement(By.CssSelector("div[data-widget='webPrice']"));    
-            string PricesText = Prices.Text;
+            string PricesText = "";
+            FoundPrice:
+            try
+            {
+                PricesText = driver.FindElement(By.CssSelector("div[data-widget$='webPrice']:not([data-widget$='webBestPrice'])")).Text;
+            }
+            catch(OpenQA.Selenium.NoSuchElementException e)
+            {
+                Console.WriteLine("Неполадки с поиском ЦЕН, скроллю вниз....");
+                Functions.ScrollDown(driver, 5000);
+                //driver.Navigate().Refresh();
+                Thread.Sleep(300);
+                goto FoundPrice;
+            }
+
             //Считаем количество элементов в диве
             string[] separators = new string[] { "\t", "\r\n" };
             string[] fil = PricesText.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-            int Size = fil.GetLength(0);
-            //Из него выводим только последнюю строку
-            //Если можно в кредит, то там 3 строки, если нельзя - одна
-            int[] p = { Size-1 };
-            PricesText = StringUtilities.SelectedRows(PricesText, p);
-            List<string> PricesNumbers = StringUtilities.ClearPrices(PricesText);
+            //если есть пункт "Лучшая цена" - вырезаем его
+            string[] PricesText1 = StringUtilities.PriceOnlyNumbers(fil);
+            int Size = PricesText1.GetLength(0);
+            List<string> PricesNumbers = new List<string>();
+            if (fil[0].Equals("Товар закончился"))
+            {                             
+                PricesNumbers.Add(StringUtilities.OnlyDigits(PricesText1[0]));
+                PricesNumbers.Add("Товар закончился"); //если закончился в цену пишем фактическую, а в цену до скидки пишем "закончился"
+            }
+            else
+            {
+                //Если можно в кредит, то там 3 строки, если нельзя - одна
+                int[] p = { Size - 1 };//если нет, то пишем цены до и после скидки, или же просто цену
+                PricesText = StringUtilities.SelectedRows(PricesText, p);
+                PricesNumbers = StringUtilities.ClearPrices(PricesText);
+            }
+            
+
+            Console.Write("Цены"+ TStringUtilities.OutputSeparator);
 
             //Выводим рейтинг
-            string Rate = driver.FindElement(By.CssSelector("div[data-widget='webCurrentSeller']")).Text;
+            var Rate = driver.FindElement(By.CssSelector("div[data-widget='webReviewProductScore']"));
+            var Rate5 = Rate.FindElement(By.CssSelector("div[style^='width']"));//параметр ширины - средняя оценка в процентах
+            var Rate1 = Rate5.GetAttribute("style");//спарсили процентное значение
+            var RateText1 = "";
+            foreach (char c in Rate1)
+            {
+                if (char.IsDigit(c)||c.Equals('.'))
+                {
+                    RateText1 += c;
+                }
+                
+            }
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+            var Rating = (double)5/(double)100 * double.Parse(RateText1, formatter);//вывели точный рейтинг по процентам от 5
 
-            //string Rate1 = driver.FindElement(By.TagName("span")).FindElement(By.TagName("strong")).Text;
-            string RateNew = StringUtilities.FindWhatUNeed(Rate);
-            RateNew.Replace(" ", "");
-            string RateText = StringUtilities.GetStringBeforeLetters(RateNew, "и");
+            string RateText = Rating.ToString();
+            RateText = RateText.Replace(',', '.');//поменяли на точку для унификации с остальными значениями, которые тоже все через точку
+            Console.Write("Рейтинг"+ TStringUtilities.OutputSeparator);
+
             //вычленяем названия параметров товара
-
             List<string> ParameterNames1 = new List<string>();
             List<string> Parameters1 = new List<string>();
-            string Data = driver.FindElement(By.Id("section-characteristics")).Text;
-            string[] DataArr = StringUtilities.ToStringArray(Data);
-            int DataLength = DataArr.GetLength(0);
-            for (int i=1; i<DataLength-1; i++)
+            Functions.ScrollDown(driver, 5000); //скроллим к параметрам
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+
+        Found2:
+            IList<IWebElement> DataNames = new List<IWebElement>();
+            IList<IWebElement> DataMeanings = new List<IWebElement>();
+            try
             {
-                if (i%2!=0)
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                //есть 2 поля с данным ксс-селектором - вначале (краткое) и в конце (полное)
+                IList<IWebElement> Data1 = driver.FindElements(By.CssSelector("div[data-widget='webCharacteristics']"));
+                //выбираем которое в конце
+                IWebElement Data2 = Data1[1];
+                DataNames = Data2.FindElements(By.TagName("dt")); //выбираем названия характеристик по тегу
+                DataMeanings = Data2.FindElements(By.TagName("dd")); //выбираем сами характеристики по тегу
+            }
+            catch (System.ArgumentOutOfRangeException e)
+            {              
+                Console.WriteLine("Неполадки с поиском ГРУППЫ ХАРАКТЕРИСТИК, скроллю вниз и перезагружаюсь....");
+                Functions.ScrollDown(driver, 5000);
+                Thread.Sleep(100);
+                goto Found2;
+            }
+
+            // если характеристики не успели заполниться, откатываемся назад, и так до полной прогрузки страницы
+            foreach (IWebElement W in DataNames)
+            {
+                if ((W.Text).Equals(""))
                 {
-                    ParameterNames1.Add(DataArr[i]);
+                    goto Found2;
                 }
                 else
                 {
-                    Parameters1.Add(DataArr[i]);
+                 ParameterNames1.Add(W.Text);
+                }                           
+            }
+
+            foreach (IWebElement W in DataMeanings)
+            {
+                if ((W.Text).Equals(""))
+                {
+                    goto Found2;
+                }
+                else
+                {
+                    Parameters1.Add(W.Text);
                 }
             }
 
@@ -198,47 +319,12 @@ namespace Parse1
             {
                 ParameterStr1 += s + "\t";
             }
-
-            //IList<IWebElement> ParameterNamesCol = driver.FindElements(By.ClassName("lj9"));
-            ////string t = oCheckBox.Text;
-            //List<string> ParameterNames = new List<string>();
-            
-            //foreach (IWebElement s in ParameterNamesCol)
-            //{
-            //    //var yy = s.FindElement(By.ClassName("ui-p8"));
-            //    //Console.WriteLine(yy.Text);
-            //    string Text = s.Text;
-            //    Text = Text.Replace("\r\n", "\t");
-            //    ParameterNames.Add(Text);
-            //}
-            //string ParameterNamesStr = "";
-            //foreach (string s in ParameterNames)
-            //{
-            //    ParameterNamesStr += s + "\t";
-            //}
-
-            //////вычленяем параметры товара
-            //IList<IWebElement> ParameterCol = driver.FindElements(By.ClassName("l9j"));
-            ////string t = oCheckBox.Text;
-            //List<string> Parameters = new List<string>();
-            //foreach (IWebElement s in ParameterCol)
-            //{
-            //    //var yy = s.FindElement(By.ClassName("ui-p8"));
-            //    //Console.WriteLine(yy.Text);
-            //    string Text = s.Text;
-            //    Text = Text.Replace("\r\n", "\t");
-            //    Parameters.Add(Text);
-            //}
-            //string ParameterStr = "";
-            //foreach (string s in Parameters)
-            //{
-            //    ParameterStr += s + "\t";
-            //}
-
+            Console.Write("Параметры"+TStringUtilities.OutputSeparator);
             //Выделяем нужные атрибуты для внесения
             List<string> Attributes = new List<string>();
             Attributes.Add(Head1Text);
             Attributes.Add(CodeText);
+            Attributes.Add(URL);
             Attributes.Add(RewiewsTextNum);
             Attributes.Add(VideoTextNum);
             Attributes.Add(QuestionsTextNum);
@@ -256,127 +342,156 @@ namespace Parse1
             {
                 OutputString += e + "\t";
             }
-            file.WriteLineAsync(OutputString+"\r\n");
-            return OutputString;
 
+            file.WriteLineAsync(OutputString);//+"\r\n");
+            Console.Write("ГОТОВО");
             Console.WriteLine();
+            return OutputString;
             
-
-
         }
         /// <summary>
         /// Субпрога, парсит одну страницу с совокупностью карточек, на вывод - одна строка со всеми карточками, разбитыми построчно
         /// </summary>
         /// <param name="driver">созданный драйвер</param>
         /// <param name="InputParameters">список параметров для CardParser</param>
-        /// <returns></returns>
-        public string PageParser(IWebDriver driver, List<string> InputParameters, StreamWriter file)
+        /// <param name="file">текстовый поток для вывода в файл</param>
+        /// <param name="NumOfCards">ограничение по количеству карточек для парсинга</param>
+        /// <returns>строка со всеми карточками страницы</returns>
+        public string PageParser(IWebDriver driver, List<string> InputParameters, StreamWriter file, int NumOfCards)
         {
             TPages Pages = new TPages();
+            TFunctions Functions = new TFunctions();
             string PageString = "";
-          
+            Thread.Sleep(200);
+            Functions.ScrollDown(driver, 5000);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            //Functions.ScrollDown(driver, 5000);
+            //Thread.Sleep(2000);
+            
+            String CurrentPageURL = driver.Url;
             //Находим координаты всех карточек на странице
             //Сначала находим див со ссылкой на страницу
-            IList<IWebElement> ClickList = driver.FindElements(By.ClassName("yh5"));
-            int i = 0;
+            IList<IWebElement> ClickList0 = driver.FindElements(By.CssSelector("a[class*='tile-hover-target']"));//класс, содержащий в себе "tile.."
+            //для каждой карточки их 2 (ссылка на фотке и на тексте с названием)
+            IList<IWebElement> ClickList = new List<IWebElement>();
+            int counter = 0;
+            foreach (var v in ClickList0)
+            {
+                counter++;
+                if(counter%2==0)
+                    {
+                    ClickList.Add(v);//выбрали одну из 2
+                    }
+            }
+
             List<string> ListOfReferences2Cards = new List<string>();
             //Для каждого дива находим его заголовок "а" и принадлежащий ему аттрибут - ссылку href, сохраняем
             foreach (IWebElement click in ClickList)
             {
-                IWebElement ee = ClickList[i].FindElement(By.TagName("a"));
-                string oo = ee.GetAttribute("href");
+                string oo = click.GetAttribute("href");
                 ListOfReferences2Cards.Add(oo);
-                i++;
+                //i++;
             }
 
             int NumberOfCards = ClickList.Count;
-            StreamWriter read = new StreamWriter("RarePoints.txt");
 
             for (int j=0;j<NumberOfCards; j++)
             {
-                //Console.WriteLine("Парсим карточку # " + j);
-                // используя сохранённые ссылки, можно гулять по всей странице, ниже это сделано вручную
-                driver.Navigate().GoToUrl(ListOfReferences2Cards[j]);
-                Thread.Sleep(1000);
+                Point1:
+                try
+                {
+                    driver.Navigate().GoToUrl(ListOfReferences2Cards[j]);
+                }
+                catch (OpenQA.Selenium.WebDriverException e)
+                {
+                    Console.WriteLine("Не удалось перейти на страницу карточки, пропускаем её");
+                    Console.WriteLine(e.Message);
+                    j++;
+                    goto Point1;
+
+                }
+
                 string CardParserString = Pages.CardParser(driver, InputParameters, ref TStringUtilities.CardCounter, file);
                 PageString += CardParserString + "\r\n";
 
-                foreach (char Ch in CardParserString)
+                if (NumOfCards<=TStringUtilities.CardCounter)
                 {
-                    read.Write(Ch);
+                    return PageString; //выходим из функции, если спарсили заданное количество карточек
                 }
-                read.Write("\r\n");
 
-                driver.Navigate().Back();
-                Thread.Sleep(100);
-                driver.Navigate().Refresh();
-                Thread.Sleep(100);
             }
 
+            //возвращаемся на страницу с карточками, чтобы перейти по кнопке Далее
+            driver.Navigate().GoToUrl(CurrentPageURL);
             File.WriteAllText("WriteText333.txt", PageString);
-
-            ///https://automated-testing.info/t/obshhij-algoritm-resheniya-element-is-not-attached-to-page-document/13003/5
-            //bool staleElement = true;
-            //for (int i = 0; i < 4; i++)
-            //{
-
-
-            //    while (staleElement)
-            //    {
-            //        try
-            //        {
-            //            ClickList = driver.FindElements(By.ClassName("q3h"));
-            //            ClickList[i].Click();
-            //            staleElement = false;
-            //        }
-            //        catch (StaleElementReferenceException e)
-            //        {
-            //            staleElement = true;//might be chance for infinity--coz (if the try-block keep on -failing.it won't resolve the issue,--> My Percepton in one case.)
-            //        }
-            //    }
 
 
             return PageString;
         }
         /// <summary>
-        /// Главная функция парсинга выбранного количества страниц и вывода
+        /// Главная функция парсинга выбранного количества страниц/карточек и вывода
         /// </summary>
         /// <param name="driver">созданный драйвер</param>
         /// <param name="InputParameters">Параметры с карточки на вывод и на вход субпрогам</param>
         /// <param name="NumberOfPages">Количество страниц для парсинга</param>
-        /// <returns></returns>
-        public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages, StreamWriter file)
+        /// <returns>строка со всеми карточками</returns>
+        public string ParseTotal(IWebDriver driver, List<string> InputParameters, int NumberOfPages, int NumOfCards, StreamWriter file)
         {
             TPages Pages = new TPages();
             string TotalParceData = "";
-
+            //string ClickList0 = driver.FindElement(By.CssSelector("div[data-widget='fulltextResultsHeader']")).Text;//Проверяем, сколько всего товароd
             for (int i = 0; i < NumberOfPages; i++)
             {
                 //OpenQA.Selenium.NoSuchElementException
-                string Card = Pages.PageParser(driver, InputParameters, file);
+                string Card = Pages.PageParser(driver, InputParameters, file, NumOfCards);
                 Card += "\r\n";
                 TotalParceData = string.Concat(TotalParceData, Card);
-                // обновляем каждый виток, чтобы не выдавало ошибку
-                Found:
+
+                if (NumOfCards <= TStringUtilities.CardCounter)
+                {
+                    File.WriteAllText("WriteTextTotal.txt", TotalParceData);
+                    Console.WriteLine("");
+                    Console.WriteLine("==================================");
+                    Console.WriteLine("==================================");
+                    Console.WriteLine("Закончил парсить по количеству карточек");
+                    Console.WriteLine("==================================");
+                    Console.WriteLine("==================================");
+                    return TotalParceData;
+                }
+
+            // обновляем каждый виток, чтобы не выдавало ошибку
+            Found:
                 Console.WriteLine("");
-                Thread.Sleep(5000);
+                Thread.Sleep(2000);
+                Console.WriteLine("*************************************");
+                Console.WriteLine("*************************************");
+                Console.WriteLine("Считал " + (i+1) + " cтраницу, перехожу на " + (i + 2));
+                Console.WriteLine("*************************************");
+                Console.WriteLine("*************************************");
                 try
                 {
-                    IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-f'][contains(.,'Дальше')]"));
+                    //IWebElement NextPage = driver.FindElement(By.XPath("//div[@class='ui-f'][contains(.,'Дальше')]"));
+                    IWebElement NextPage = driver.FindElement(By.LinkText("Дальше"));
                     NextPage.Click();
                 }
                 catch (OpenQA.Selenium.NoSuchElementException e)
                 {
                     driver.Navigate().Refresh();
+                    Thread.Sleep(6000);                  
                     driver.Navigate().Back();
                     Console.WriteLine("Неполадки с поиском кнопки Далее, перезагружаюсь....");
                     goto Found;
                 }
-                Thread.Sleep(1000);
-
+                Thread.Sleep(2000);
             }
 
             File.WriteAllText("WriteTextTotal.txt", TotalParceData);
+            Console.WriteLine("");
+            Console.WriteLine("==================================");
+            Console.WriteLine("==================================");
+            Console.WriteLine("Закончил парсить по количеству страниц");
+            Console.WriteLine("==================================");
+            Console.WriteLine("==================================");
             return TotalParceData;
         }
 

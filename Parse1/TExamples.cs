@@ -354,6 +354,41 @@ namespace Parse1
             driver.Navigate().GoToUrl("https://seller.ozon.ru/app/analytics/what-to-sell/ozon-bestsellers");
         }
 
+        public void Tryin2Find()
+        {
+            IWebDriver driver = new ChromeDriver();
+            driver.Navigate().GoToUrl("https://seller.ozon.ru/app/analytics/what-to-sell/ozon-bestsellers");
+            //IWebElement Code = driver.FindElement(By.XPath("//span[@class='jv3 vj3'][contains(.,'Код')]")); исходный
+
+            //IWebElement Code2 = driver.FindElement(By.XPath("//div[text() = 'Код ']"));// нет
+            //button
+            //IWebElement Code3 = driver.FindElement(By.XPath("//div[. = 'Код']"));//нет
+
+            // IWebElement Code4 = driver.FindElement(By.XPath("//*[contains(., 'Код')]"));
+            //string CodeTextPrev4 = Code4.Text;//вообще весь
+            //IWebElement Code5 =  driver.FindElement(By.XPath("//div[contains(text(),'Код')]"));//нет
+            //string CodeTextPrev5 = Code5.Text;
+            //IWebElement Code6 = driver.FindElement(By.XPath("//div[][. = 'Код']"));//неправильный икс пасс
+            //string CodeTextPrev5 = Code6.Text;
+            string CodeTextPrev = driver.FindElement(By.CssSelector("span[data-widget='webDetailSKU']")).Text;
+            // string CodeTextPrev2 = Code2.Text;
+            // string CodeTextPrev3 = Code3.Text;
+
+        }
+
+        public void SwitchPages()
+        {
+            IWebDriver driver = new ChromeDriver();
+            driver.Navigate().GoToUrl("https://www.ozon.ru/category/elektricheskie-teplye-poly-10217/?category_was_predicted=true&from_global=true&text=%D1%82%D0%B5%D0%BF%D0%BB%D1%8B%D0%B9+%D0%BF%D0%BE%D0%BB+%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9");
+            IWebElement CodeTextPrev = driver.FindElement(By.LinkText("Дальше"));
+            CodeTextPrev.Click();
+            Thread.Sleep(2000);
+            IWebElement CodeTextPrev1 = driver.FindElement(By.LinkText("Дальше"));
+            CodeTextPrev1.Click();
+            string s = "";
+
+        }
+
 
 
 

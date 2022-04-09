@@ -13,12 +13,44 @@ namespace Parse1
 {
     class TStringUtilities
     {
-        public static int CardCounter = 1;
+        public static string OutputSeparator = "=>";
+        public static int CardCounter = 0;
         /// <summary>
         /// Находит из многих строк с разделителями нужные по номерам строк и выписывает их в строку с табуляционным разделителем
         /// </summary>
         /// <param name="Initial"></param>
         /// <returns></returns>
+        public string[] PriceOnlyNumbers(string[] Initial)
+        {
+            string[] separators = new string[] { "\t", "\r\n" };
+            List<string> Filtered = new List<string>();
+            bool Marker = false;
+            foreach (string s in Initial)
+            {
+                foreach (char c in s)
+                {
+                    if (char.IsDigit(c)==true )
+                    {
+                        Marker = true;
+                    }
+                }
+                if (Marker)
+                {
+                    Filtered.Add(s);
+                }
+                Marker = false;
+            }
+
+            string[] Ans = new string[Filtered.Count];
+
+            for (int i=0; i<Filtered.Count; i++)
+            {
+                Ans[i] = Filtered[i];
+            }
+
+            //string[] Ans = Filtered.ToString().Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            return Ans;
+        }
         public string SelectedRows(string Initial, int[]Rows)
         {
             string[] separators = new string[] { "\t", "\r\n" };
@@ -26,6 +58,7 @@ namespace Parse1
             int Size = fil.GetLength(0);
             int Size1 = Rows.GetLength(0);
             string Ans = "";
+            
 
             for (int i=0;i<Size1;i++)
             {
@@ -174,6 +207,38 @@ namespace Parse1
             string[] separators = new string[] { "\t", "\r\n" };
             string[] fil = Name.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             return fil;
+        }
+
+        public bool FindInList(string Name, string What2Find)
+        {
+            string[] separators = new string[] { "\t", "\r\n" };
+            string[] fil = Name.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            bool Ans = false;
+            foreach (string s in fil)
+            {
+                if (s.Contains(What2Find))
+                {
+                    Ans = true;
+                    break;
+                }
+
+            }
+            return Ans;
+        }
+
+        public string OnlyDigits(string BasicString)
+        {
+            string Digits = "";
+
+            foreach (char Char1 in BasicString)
+            {
+                if (char.IsDigit(Char1) == true) //выводим только цифры
+                {
+                    Digits += Char1;
+                }
+
+            }
+            return Digits;
         }
 
 
