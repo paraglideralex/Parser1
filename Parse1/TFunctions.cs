@@ -18,14 +18,14 @@ namespace Parse1
             js.ExecuteScript("window.scroll(0, "+PixelsDown+");");
         }
 
-        public int[] TimeOutput (DateTime Initial, DateTime Finish)
+        public void TimeOutput (TimeSpan Range)
         {
-            TimeSpan result = Finish - Initial;
-            int result1 = Convert.ToInt32(result.Seconds.ToString());
-            int munutes = result1 / 60;
-            int seconds = result1 % 60;
-            
-            return new int[] { munutes, seconds, result1 };
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                Range.Hours, Range.Minutes, Range.Seconds,
+                Range.Milliseconds / 10);
+            double Total = Convert.ToDouble(Range.TotalSeconds);
+            Console.WriteLine("Время работы парсера: " + elapsedTime);
+            Console.WriteLine("Среднее время на карточку:  " + Total / (double)TStringUtilities.CardCounter + " секунд");
         }
 
     }

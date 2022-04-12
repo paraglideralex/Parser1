@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 
 namespace Parse1
 {
@@ -14,7 +15,8 @@ namespace Parse1
     {
         static void Main(string[] args)
         {
-            DateTime one = DateTime.Now;//счётчик времени выполнения
+            Stopwatch stopwatch = new Stopwatch();//счётчик времени выполнения
+            stopwatch.Start();
             TExamples Examples = new TExamples();
             TPages Pages = new TPages();
             TStringUtilities StringUtilities = new TStringUtilities();
@@ -78,13 +80,13 @@ namespace Parse1
             // Для работы ParseTotal
             driver.Navigate().GoToUrl("https://www.ozon.ru/category/multimetry-i-testery-10080/?category_was_predicted=true&from_global=true&text=%D0%BC%D1%83%D0%BB%D1%8C%D1%82%D0%B8%D0%BC%D0%B5%D1%82%D1%80");
             Thread.Sleep(3000);
-            string TotalParceData = Pages.ParseTotal(driver, InputParameters, 1, 25, writer); // эту строку я руками копировал, сохранял в файл и считывал через ExportString
+            string TotalParceData = Pages.ParseTotal(driver, InputParameters, 1, 2, writer); // эту строку я руками копировал, сохранял в файл и считывал через ExportString
             writer.Close();
-            DateTime two = DateTime.Now;
+            stopwatch.Stop();
+            TimeSpan ts = stopwatch.Elapsed;
 
             Console.WriteLine("Спарсил суммарно карточек: " + TStringUtilities.CardCounter);
-            Console.WriteLine("Время работы программы:  " + Functions.TimeOutput(one, two)[0] + " минут, " + Functions.TimeOutput(one, two)[1] + " секунд");
-            Console.WriteLine("Среднее время на карточку:  " + (float)Functions.TimeOutput(one, two)[2] / (float)TStringUtilities.CardCounter + " секунд");
+            Functions.TimeOutput(ts);
             Console.WriteLine("txt-файл для прямого копирования в эксель сохранён в Parser1/bin/Debug/test1.txt");
             Console.WriteLine("Нажмите любую клавишу для выхода");
             Console.ReadKey();
