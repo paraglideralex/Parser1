@@ -24,6 +24,7 @@ namespace Parse1
                 Range.Hours, Range.Minutes, Range.Seconds,
                 Range.Milliseconds / 10);
             double Total = Convert.ToDouble(Range.TotalSeconds);
+            Console.WriteLine("Спарсил суммарно карточек: " + TStringUtilities.CardCounter);
             Console.WriteLine("Время работы парсера: " + elapsedTime);
             Console.WriteLine("Среднее время на карточку:  " + Total / (double)TStringUtilities.CardCounter + " секунд");
         }

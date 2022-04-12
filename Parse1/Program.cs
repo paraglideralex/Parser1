@@ -87,12 +87,8 @@ namespace Parse1
             string TotalParceData = Pages.ParseTotal(driver, InputParameters, 10, 117, writer); // эту строку я руками копировал, сохранял в файл и считывал через ExportString
             writer.Close();
             stopwatch.Stop();
-            TimeSpan ts = stopwatch.Elapsed;
-
-            Console.WriteLine("Спарсил суммарно карточек: " + TStringUtilities.CardCounter);
+            TimeSpan ts = stopwatch.Elapsed;          
             Functions.TimeOutput(ts);
-            Console.WriteLine("txt-файл для прямого копирования в эксель сохранён в Parser1/bin/Debug/test1.txt");
-            Console.WriteLine("Нажмите любую клавишу для выхода");
             Console.ReadKey();
             driver.Close();
 
