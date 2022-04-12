@@ -9,7 +9,7 @@ namespace Parse1
     internal class TProductDataCollection
     {
         public List<string> InputRankParameters = new List<string>()
-            { "Название", "Артикул", "Ссылка",  "Отзывы","К-во видео",
+            { "Название", "Артикул", "Ссылка", "Брэнд", "Продавец",  "Отзывы","К-во видео",
               "К-во вопросов", "Рейтинг","Цена после скидки", "Цена до скидки"};
 
 

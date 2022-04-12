@@ -256,6 +256,58 @@ namespace Parse1
             RateText = RateText.Replace(',', '.');//поменяли на точку для унификации с остальными значениями, которые тоже все через точку
             Console.Write("Рейтинг"+ TStringUtilities.OutputSeparator);
 
+            //Вычленяем бренд товара
+            //Он может быть представлен либо в виде фотки, либо текстом
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(7);
+            //Сначала ищем по фотке с title, такие чаще встречаются
+            string BrandText = "";
+            try
+            {
+                var BrandText1 = driver.FindElement(By.CssSelector("img[title^='Все товары бренда']"));
+                string BrandText2 = BrandText1.GetAttribute("title");
+                BrandText = BrandText2.Substring(18);
+            }
+            catch (OpenQA.Selenium.NoSuchElementException)
+            {
+                Console.WriteLine("Не найден бренд с фотографией, пробуем по словам");
+
+                BrandText = "";
+            }
+            //Если за 7 секунд найти не удалось, значит бренд таекстовый - ищем бренд без картинки
+            if (BrandText == "")
+            { 
+                try
+                {
+                    var BrandText1 = driver.FindElement(By.CssSelector("div[data-widget='webBrand']")); 
+                    var BrandText2 = BrandText1.FindElement(By.TagName("a")).Text;
+                    BrandText = BrandText2.Substring(18);
+                }
+                catch (OpenQA.Selenium.NoSuchElementException)
+                {
+                    Console.WriteLine("За 10 секунд не найден бренд, скорее всего его нет");
+
+                    BrandText = "БРЕНД НЕ НАЙДЕН";
+                }
+            }
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+
+            //вычленяем продавца товара
+            string SellerText = "";
+            try
+            {
+                var Seller1 = driver.FindElement(By.CssSelector("div[data-widget='webCurrentSeller']"));
+                var Seller2 = Seller1.FindElements(By.TagName("a"));
+                SellerText = Seller2[1].GetAttribute("title");
+            }
+            catch (OpenQA.Selenium.NoSuchElementException)
+            {
+                Console.WriteLine("Продавец не найден");
+
+                SellerText = "ПРОДАВЕЦ НЕ НАЙДЕН";
+            }
+
+
+
             //вычленяем названия параметров товара
             List<string> ParameterNames1 = new List<string>();
             List<string> Parameters1 = new List<string>();
@@ -325,6 +377,8 @@ namespace Parse1
             Attributes.Add(Head1Text);
             Attributes.Add(CodeText);
             Attributes.Add(URL);
+            Attributes.Add(BrandText);
+            Attributes.Add(SellerText);
             Attributes.Add(RewiewsTextNum);
             Attributes.Add(VideoTextNum);
             Attributes.Add(QuestionsTextNum);
